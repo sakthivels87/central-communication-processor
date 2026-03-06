@@ -1,23 +1,16 @@
-const { consumer } = require("../config/kafka");
-const processMessage = require("../services/notificationService");
-const logger = require("../utils/logger");
+const { retryConsumer } = require("../config/kafka");
+const processMessage = require("../services/communicationProcessor");
 
 async function startRetryConsumer() {
-  await consumer.connect();
+  await retryConsumer.connect();
 
-  await consumer.subscribe({ topic: "retry-dlq" });
+  await retryConsumer.subscribe({ topic: "retry-dlq", fromBeginning: true });
 
-  await consumer.run({
+  await retryConsumer.run({
     eachMessage: async ({ message }) => {
-      try {
-        const payload = JSON.parse(message.value.toString());
+      const payload = JSON.parse(message.value.toString());
 
-        logger.info("Retrying message from retry-dlq");
-
-        await processMessage(payload);
-      } catch (err) {
-        logger.error("Retry failed again");
-      }
+      await processMessage(payload);
     },
   });
 }

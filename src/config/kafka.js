@@ -1,11 +1,23 @@
 const { Kafka } = require("kafkajs");
 
 const kafka = new Kafka({
-  clientId: "notification-priority-consumer",
+  clientId: "notification-processor",
   brokers: ["localhost:9092"],
 });
 
-const consumer = kafka.consumer({ groupId: "priority-consumer-group" });
+const priorityConsumer = kafka.consumer({
+  groupId: "priority-consumer-group",
+});
+
+const retryConsumer = kafka.consumer({
+  groupId: "retry-consumer-group",
+});
+
 const producer = kafka.producer();
 
-module.exports = { kafka, consumer, producer };
+module.exports = {
+  kafka,
+  producer,
+  priorityConsumer,
+  retryConsumer,
+};
