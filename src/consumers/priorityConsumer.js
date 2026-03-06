@@ -19,7 +19,6 @@ async function startPriorityConsumer() {
   await consumer.subscribe({ topic: "priority-high", fromBeginning: true });
   await consumer.subscribe({ topic: "priority-medium", fromBeginning: true });
   await consumer.subscribe({ topic: "priority-low", fromBeginning: true });
-
   await consumer.run({
     eachMessage: async ({ topic, message }) => {
       const payload = JSON.parse(message.value.toString());

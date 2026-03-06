@@ -4,7 +4,6 @@ const logger = require("../utils/logger");
 
 async function processMessage(message) {
   const collection = await connectDB();
-
   try {
     await collection.updateOne(
       { trackingId: message.trackingId },
@@ -22,7 +21,7 @@ async function processMessage(message) {
   } catch (error) {
     message.statusMessage = "Request failed in processing will retry shortly.";
 
-    await collection.updateOne(message);
+    await collection.insertOne(message);
 
     logger.error("Processing failed", error);
 
