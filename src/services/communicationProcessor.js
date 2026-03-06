@@ -6,16 +6,23 @@ async function processMessage(message) {
   const collection = await connectDB();
 
   try {
-    message.status = "IN_PROGRESS";
-    message.statusMessage = `Request delivered to ${message.channel} processor`;
-
-    await collection.insertOne(message);
-
+    await collection.updateOne(
+      { trackingId: message.trackingId },
+      {
+        $set: {
+          channel: message.channel,
+          status: "IN_PROGRESS",
+          statusMessage: `Request delivered to ${message.channel} processor`,
+          updatedAt: new Date(),
+        },
+      },
+      { upsert: true },
+    );
     await sendToChannel(message.channel, message);
   } catch (error) {
     message.statusMessage = "Request failed in processing will retry shortly.";
 
-    await collection.insertOne(message);
+    await collection.updateOne(message);
 
     logger.error("Processing failed", error);
 
