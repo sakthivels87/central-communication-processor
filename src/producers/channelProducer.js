@@ -3,8 +3,9 @@ const logger = require("../utils/logger");
 
 async function sendToChannel(channel, message) {
   try {
+    await producer.connect();
     await producer.send({
-      topic: channel,
+      topic: "email",
       messages: [
         {
           key: message.customerId || "default",
