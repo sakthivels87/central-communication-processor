@@ -5,18 +5,13 @@ const logger = require("../utils/logger");
 async function processMessage(message) {
   const collection = await connectDB();
   try {
-    await collection.updateOne(
-      { trackingId: message.trackingId },
-      {
-        $set: {
-          channel: message.channel,
-          status: "IN_PROGRESS",
-          statusMessage: `Request delivered to ${message.channel} processor`,
-          updatedAt: new Date(),
-        },
-      },
-      { upsert: true },
-    );
+    const payload = {
+      ...message,
+      status: "IN_PROGRESS",
+      statusMessage: `Request delivered to ${message.channel} processor`,
+      createdAt: new Date(),
+    };
+    await collection.insertOne(payload);
     await sendToChannel(message.channel, message);
   } catch (error) {
     message.statusMessage = "Request failed in processing will retry shortly.";

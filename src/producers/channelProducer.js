@@ -5,7 +5,7 @@ async function sendToChannel(channel, message) {
   try {
     await producer.connect();
     await producer.send({
-      topic: "email",
+      topic: channel,
       messages: [
         {
           key: message.customerId || "default",
